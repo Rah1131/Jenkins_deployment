@@ -1,0 +1,126 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "profiles_GlobalLoadBalancer_name": {
+            "defaultValue": "GlobalLoadBalancer",
+            "type": "String"
+        }
+    },
+    "variables": {},
+    "resources": [
+        {
+            "type": "Microsoft.Cdn/profiles",
+            "apiVersion": "2025-04-15",
+            "name": "[parameters('profiles_GlobalLoadBalancer_name')]",
+            "location": "Global",
+            "sku": {
+                "name": "Standard_AzureFrontDoor"
+            },
+            "kind": "frontdoor",
+            "properties": {
+                "originResponseTimeoutSeconds": 60
+            }
+        },
+        {
+            "type": "Microsoft.Cdn/profiles/afdendpoints",
+            "apiVersion": "2025-04-15",
+            "name": "[concat(parameters('profiles_GlobalLoadBalancer_name'), '/Frontend')]",
+            "location": "Global",
+            "dependsOn": [
+                "[resourceId('Microsoft.Cdn/profiles', parameters('profiles_GlobalLoadBalancer_name'))]"
+            ],
+            "properties": {
+                "enabledState": "Enabled"
+            }
+        },
+        {
+            "type": "Microsoft.Cdn/profiles/origingroups",
+            "apiVersion": "2025-04-15",
+            "name": "[concat(parameters('profiles_GlobalLoadBalancer_name'), '/GeoGroup')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Cdn/profiles', parameters('profiles_GlobalLoadBalancer_name'))]"
+            ],
+            "properties": {
+                "loadBalancingSettings": {
+                    "sampleSize": 4,
+                    "successfulSamplesRequired": 3,
+                    "additionalLatencyInMilliseconds": 50
+                },
+                "healthProbeSettings": {
+                    "probePath": "/",
+                    "probeRequestType": "GET",
+                    "probeProtocol": "Http",
+                    "probeIntervalInSeconds": 100
+                },
+                "sessionAffinityState": "Disabled"
+            }
+        },
+        {
+            "type": "Microsoft.Cdn/profiles/origingroups/origins",
+            "apiVersion": "2025-04-15",
+            "name": "[concat(parameters('profiles_GlobalLoadBalancer_name'), '/GeoGroup/CanadaOrigin')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Cdn/profiles/origingroups', parameters('profiles_GlobalLoadBalancer_name'), 'GeoGroup')]",
+                "[resourceId('Microsoft.Cdn/profiles', parameters('profiles_GlobalLoadBalancer_name'))]"
+            ],
+            "properties": {
+                "hostName": "4.248.248.136",
+                "httpPort": 80,
+                "httpsPort": 443,
+                "originHostHeader": "4.248.248.136",
+                "priority": 1,
+                "weight": 1000,
+                "enabledState": "Enabled",
+                "enforceCertificateNameCheck": true
+            }
+        },
+        {
+            "type": "Microsoft.Cdn/profiles/origingroups/origins",
+            "apiVersion": "2025-04-15",
+            "name": "[concat(parameters('profiles_GlobalLoadBalancer_name'), '/GeoGroup/IndiaOrigin')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Cdn/profiles/origingroups', parameters('profiles_GlobalLoadBalancer_name'), 'GeoGroup')]",
+                "[resourceId('Microsoft.Cdn/profiles', parameters('profiles_GlobalLoadBalancer_name'))]"
+            ],
+            "properties": {
+                "hostName": "20.235.178.114",
+                "httpPort": 80,
+                "httpsPort": 443,
+                "originHostHeader": "20.235.178.114",
+                "priority": 1,
+                "weight": 1000,
+                "enabledState": "Enabled",
+                "enforceCertificateNameCheck": true
+            }
+        },
+        {
+            "type": "Microsoft.Cdn/profiles/afdendpoints/routes",
+            "apiVersion": "2025-04-15",
+            "name": "[concat(parameters('profiles_GlobalLoadBalancer_name'), '/Frontend/GeoRoute')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Cdn/profiles/afdendpoints', parameters('profiles_GlobalLoadBalancer_name'), 'Frontend')]",
+                "[resourceId('Microsoft.Cdn/profiles', parameters('profiles_GlobalLoadBalancer_name'))]",
+                "[resourceId('Microsoft.Cdn/profiles/origingroups', parameters('profiles_GlobalLoadBalancer_name'), 'GeoGroup')]"
+            ],
+            "properties": {
+                "customDomains": [],
+                "originGroup": {
+                    "id": "[resourceId('Microsoft.Cdn/profiles/origingroups', parameters('profiles_GlobalLoadBalancer_name'), 'GeoGroup')]"
+                },
+                "ruleSets": [],
+                "supportedProtocols": [
+                    "Http",
+                    "Https"
+                ],
+                "patternsToMatch": [
+                    "/*"
+                ],
+                "forwardingProtocol": "MatchRequest",
+                "linkToDefaultDomain": "Enabled",
+                "httpsRedirect": "Enabled",
+                "enabledState": "Enabled"
+            }
+        }
+    ]
+}

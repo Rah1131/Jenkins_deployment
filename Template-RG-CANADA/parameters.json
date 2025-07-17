@@ -1,0 +1,45 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "virtualMachines_CANADA1_VM1_name": {
+            "value": null
+        },
+        "virtualMachines_CANADA1_VM2_name": {
+            "value": null
+        },
+        "virtualNetworks_VNET_CANADA1_name": {
+            "value": null
+        },
+        "publicIPAddresses_AG_FRONTEND_name": {
+            "value": null
+        },
+        "publicIPAddresses_AG_FRONTEND1_name": {
+            "value": null
+        },
+        "publicIPAddresses_CANADA1_VM1_ip_name": {
+            "value": null
+        },
+        "publicIPAddresses_CANADA1_VM2_ip_name": {
+            "value": null
+        },
+        "networkInterfaces_canada1_vm1623_z1_name": {
+            "value": null
+        },
+        "networkInterfaces_canada1_vm2405_z1_name": {
+            "value": null
+        },
+        "networkSecurityGroups_AppGateway_NSG_name": {
+            "value": null
+        },
+        "applicationGateways_AppGateway_CANADA_name": {
+            "value": null
+        },
+        "networkSecurityGroups_CANADA1_VM1_nsg_name": {
+            "value": null
+        },
+        "networkSecurityGroups_CANADA1_VM2_nsg_name": {
+            "value": null
+        }
+    }
+}
